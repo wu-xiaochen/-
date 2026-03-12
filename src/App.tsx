@@ -1,6 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { Menu, ChevronDown, ChevronUp, AlertTriangle, CheckCircle, Box, FileText, Activity, Cpu, Truck, ShieldCheck, Sliders, Download, Lightbulb, ChevronRight, AlertCircle, ClipboardList, Target, Zap, Layers, Bookmark } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { OrbitControls, Environment, ContactShadows } from '@react-three/drei';
+import * as THREE from 'three';
 
 type MessageType = 'user' | 'ai';
 interface Message { id: string; type: MessageType; content: React.ReactNode; }
@@ -268,6 +271,92 @@ export interface ConfigState {
   telemetry: 'basic' | 'full';
 }
 
+const ValveModel = ({ config }: { config: ConfigState }) => {
+  const materialProps = config.material > 50
+    ? { color: '#e2e8f0', metalness: 0.8, roughness: 0.2 } // Stainless Steel
+    : { color: '#475569', metalness: 0.4, roughness: 0.6 }; // Carbon Steel
+
+  const heatGlowRef = useRef<THREE.Mesh>(null);
+  const ledRef = useRef<THREE.MeshStandardMaterial>(null);
+
+  useFrame(({ clock }) => {
+    if (heatGlowRef.current) {
+      const mat = heatGlowRef.current.material as THREE.MeshBasicMaterial;
+      if (mat) mat.opacity = 0.2 + Math.sin(clock.elapsedTime * 3) * 0.1;
+    }
+    if (ledRef.current) {
+      ledRef.current.emissiveIntensity = Math.sin(clock.elapsedTime * 6) > 0 ? 2 : 0;
+    }
+  });
+
+  return (
+    <group position={[0, -0.5, 0]}>
+      {/* Main Pipe */}
+      <mesh rotation={[0, 0, Math.PI / 2]}>
+        <cylinderGeometry args={[0.3, 0.3, 4, 32]} />
+        <meshStandardMaterial {...materialProps} />
+      </mesh>
+      {/* Flanges */}
+      <mesh position={[-2, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+        <cylinderGeometry args={[0.5, 0.5, 0.15, 32]} />
+        <meshStandardMaterial {...materialProps} />
+      </mesh>
+      <mesh position={[2, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+        <cylinderGeometry args={[0.5, 0.5, 0.15, 32]} />
+        <meshStandardMaterial {...materialProps} />
+      </mesh>
+      {/* Valve Body */}
+      <mesh position={[0, -0.1, 0]}>
+        <sphereGeometry args={[0.5, 32, 32]} />
+        <meshStandardMaterial {...materialProps} />
+      </mesh>
+      {/* Diaphragm Casing */}
+      <mesh position={[0, 0.6, 0]}>
+        <cylinderGeometry args={[0.9, 0.9, 0.2, 32]} />
+        <meshStandardMaterial {...materialProps} />
+      </mesh>
+      {/* Spring Housing */}
+      <mesh position={[0, 1.1, 0]}>
+        <cylinderGeometry args={[0.3, 0.4, 0.8, 32]} />
+        <meshStandardMaterial {...materialProps} />
+      </mesh>
+      {/* Adjustment Screw */}
+      <mesh position={[0, 1.6, 0]}>
+        <cylinderGeometry args={[0.08, 0.08, 0.3, 16]} />
+        <meshStandardMaterial {...materialProps} />
+      </mesh>
+
+      {/* Insulation Glow (Stress/Heat Simulation) */}
+      {config.insulation === 'advanced' && (
+        <mesh rotation={[0, 0, Math.PI / 2]} ref={heatGlowRef}>
+          <cylinderGeometry args={[0.35, 0.35, 3.8, 32]} />
+          <meshBasicMaterial color="#fb923c" transparent opacity={0.3} blending={THREE.AdditiveBlending} depthWrite={false} />
+        </mesh>
+      )}
+
+      {/* Telemetry Box */}
+      {config.telemetry === 'full' && (
+        <group position={[0.6, 0.4, 0.4]}>
+          <mesh>
+            <boxGeometry args={[0.3, 0.4, 0.2]} />
+            <meshStandardMaterial color="#1e293b" />
+          </mesh>
+          {/* Antenna */}
+          <mesh position={[0, 0.3, 0]}>
+            <cylinderGeometry args={[0.015, 0.015, 0.4]} />
+            <meshStandardMaterial color="#94a3b8" />
+          </mesh>
+          {/* LED */}
+          <mesh position={[0, 0.1, 0.11]}>
+            <sphereGeometry args={[0.04]} />
+            <meshStandardMaterial color="#3b82f6" emissive="#3b82f6" ref={ledRef} />
+          </mesh>
+        </group>
+      )}
+    </group>
+  );
+};
+
 const Step3Card = ({ onNext }: { onNext: (config: ConfigState) => void }) => {
   const [config, setConfig] = useState<ConfigState>({ days: 15, material: 100, insulation: 'advanced', telemetry: 'full' });
   const [isCalculating, setIsCalculating] = useState(false);
@@ -292,9 +381,14 @@ const Step3Card = ({ onNext }: { onNext: (config: ConfigState) => void }) => {
     setTimeout(() => { setIsCalculating(false); setShowResult(true); }, 500);
   };
 
-  const initialCostHeight = config.material > 50 ? 60 : 40 + (config.insulation === 'advanced' ? 10 : 0) + (config.telemetry === 'full' ? 10 : 0);
-  const maintenanceCostHeight = config.material > 50 ? 30 : 60 - (config.insulation === 'advanced' ? 20 : 0) - (config.telemetry === 'full' ? 10 : 0);
-  const timeCostHeight = config.days < 15 ? 80 : 40;
+  const initialCost = 12000 + (config.material > 50 ? 6000 : 0) + (config.insulation === 'advanced' ? 3500 : 0) + (config.telemetry === 'full' ? 2500 : 0);
+  const maintCost = (1500 + (config.material > 50 ? 0 : 1800) + (config.insulation === 'advanced' ? 0 : 2500) + (config.telemetry === 'full' ? 0 : 1200)) * 5; // 5-year maintenance
+  const timeCost = (30 - config.days) * 600; // Expedite risk/cost
+
+  const maxCost = 35000; // For scaling heights
+  const initialCostHeight = Math.max(10, (initialCost / maxCost) * 100);
+  const maintenanceCostHeight = Math.max(10, (maintCost / maxCost) * 100);
+  const timeCostHeight = Math.max(10, (timeCost / maxCost) * 100);
 
   return (
     <Card className="mt-2">
@@ -302,41 +396,26 @@ const Step3Card = ({ onNext }: { onNext: (config: ConfigState) => void }) => {
         <div className="flex items-center gap-2"><div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-blue-500"><Box size={14} /></div><span className="font-semibold text-gray-800 text-sm">3D仿真与个性化调节</span></div>
       </div>
       <div className="p-4">
-        <div className="w-full h-56 bg-gradient-to-br from-slate-100 to-slate-200 rounded-lg mb-4 relative flex items-center justify-center border border-slate-200 overflow-hidden" style={{ perspective: '800px' }}>
+        <div className="w-full h-64 bg-gradient-to-br from-slate-100 to-slate-200 rounded-lg mb-4 relative flex items-center justify-center border border-slate-200 overflow-hidden">
           <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'radial-gradient(#cbd5e1 1px, transparent 1px)', backgroundSize: '16px 16px' }}></div>
-          <motion.div 
-            animate={{ rotateY: [0, 360] }} 
-            transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-            style={{ transformStyle: 'preserve-3d', width: '120px', height: '160px', position: 'relative' }}
-          >
-            <div className={`absolute inset-0 ${config.material > 50 ? 'bg-slate-200' : 'bg-zinc-300'} border-2 border-slate-400 flex flex-col items-center justify-start shadow-sm rounded-sm`} style={{ transform: 'translateZ(40px)' }}>
-              <div className="w-full h-full flex">
-                <div className="w-1/2 h-full border-r border-slate-400 flex flex-col items-center justify-center relative">
-                  <div className="w-1 h-4 bg-slate-500 absolute right-1 top-1/2 transform -translate-y-1/2 rounded-full"></div>
-                  <div className="w-8 h-2 bg-slate-400 rounded-full mt-2"></div>
-                  <div className="w-8 h-2 bg-slate-400 rounded-full mt-1"></div>
-                </div>
-                <div className="w-1/2 h-full flex flex-col items-center justify-center relative">
-                  <div className="w-1 h-4 bg-slate-500 absolute left-1 top-1/2 transform -translate-y-1/2 rounded-full"></div>
-                  <div className="w-8 h-2 bg-slate-400 rounded-full mt-2"></div>
-                  <div className="w-8 h-2 bg-slate-400 rounded-full mt-1"></div>
-                </div>
-              </div>
-              <div className="absolute bottom-0 w-full h-6 bg-slate-600 border-t-2 border-slate-700"></div>
-            </div>
-            
-            <div className={`absolute inset-0 ${config.material > 50 ? 'bg-slate-300' : 'bg-zinc-400'} border-2 border-slate-400 rounded-sm`} style={{ transform: 'rotateY(180deg) translateZ(40px)' }}></div>
-            <div className={`absolute inset-0 ${config.material > 50 ? 'bg-slate-100' : 'bg-zinc-200'} border-2 border-slate-400`} style={{ width: '80px', left: '20px', transform: 'rotateY(-90deg) translateZ(60px)' }}></div>
-            <div className={`absolute inset-0 ${config.material > 50 ? 'bg-slate-300' : 'bg-zinc-400'} border-2 border-slate-400`} style={{ width: '80px', left: '20px', transform: 'rotateY(90deg) translateZ(60px)' }}></div>
-            <div className={`absolute inset-0 ${config.material > 50 ? 'bg-slate-100' : 'bg-zinc-200'} border-2 border-slate-400`} style={{ height: '80px', top: '-10px', transform: 'rotateX(90deg) translateZ(60px) scale(1.05)' }}></div>
-            <div className="absolute inset-0 bg-slate-800 border-2 border-slate-900" style={{ height: '80px', top: '80px', transform: 'rotateX(-90deg) translateZ(80px)' }}></div>
-            
-            <div className="absolute w-4 h-24 bg-yellow-500 rounded-full" style={{ left: '-10px', top: '20px', transform: 'translateZ(0px) rotateY(-90deg)' }}></div>
-            <div className="absolute w-4 h-24 bg-blue-500 rounded-full" style={{ right: '-10px', top: '20px', transform: 'translateZ(0px) rotateY(90deg)' }}></div>
-
-            {config.telemetry === 'full' && <div className="absolute -top-6 -right-16 bg-blue-900 text-white text-[10px] px-2 py-1 rounded whitespace-nowrap shadow-md flex items-center gap-1" style={{ transform: 'translateZ(50px)' }}><Activity size={10}/> 5G全量远传终端</div>}
-            {config.insulation === 'advanced' && <div className="absolute bottom-8 -left-12 bg-teal-50 text-teal-700 border border-teal-200 text-[10px] px-2 py-1 rounded whitespace-nowrap shadow-sm flex items-center gap-1" style={{ transform: 'translateZ(50px)' }}><Zap size={10}/> 防爆电伴热</div>}
-          </motion.div>
+          <div className="absolute inset-0 z-10">
+            <Canvas camera={{ position: [3, 2, 4], fov: 45 }}>
+              <ambientLight intensity={0.5} />
+              <directionalLight position={[10, 10, 5]} intensity={1} />
+              <Suspense fallback={null}>
+                <Environment preset="city" />
+                <ValveModel config={config} />
+                <ContactShadows position={[0, -1, 0]} opacity={0.4} scale={10} blur={2} far={4} />
+              </Suspense>
+              <OrbitControls enableZoom={false} autoRotate autoRotateSpeed={2} />
+            </Canvas>
+          </div>
+          
+          {/* Overlays */}
+          <div className="absolute top-2 left-2 z-20 flex flex-col gap-1">
+            {config.telemetry === 'full' && <div className="bg-blue-900/90 text-white text-[10px] px-2 py-1 rounded shadow-md flex items-center gap-1 backdrop-blur-sm"><Activity size={10}/> 5G全量远传终端</div>}
+            {config.insulation === 'advanced' && <div className="bg-orange-500/90 text-white text-[10px] px-2 py-1 rounded shadow-md flex items-center gap-1 backdrop-blur-sm"><Zap size={10}/> 防爆电伴热 (模拟开启)</div>}
+          </div>
         </div>
 
         <div className="space-y-4 mb-4">
@@ -401,16 +480,19 @@ const Step3Card = ({ onNext }: { onNext: (config: ConfigState) => void }) => {
                   <div className="text-[10px] text-gray-500 mb-1 font-semibold">TCO 多维对比图表</div>
                   <div className="flex-1 flex items-end gap-2 pt-2 h-24">
                     <div className="flex-1 flex flex-col items-center gap-1 h-full justify-end">
+                      <span className="text-[9px] text-blue-600 font-bold mb-0.5">¥{(initialCost/10000).toFixed(1)}万</span>
                       <div className="w-full bg-blue-400 rounded-t transition-all duration-500" style={{ height: `${initialCostHeight}%` }}></div>
-                      <span className="text-[8px] text-gray-400">初期成本</span>
+                      <span className="text-[8px] text-gray-400">初期采购</span>
                     </div>
                     <div className="flex-1 flex flex-col items-center gap-1 h-full justify-end">
+                      <span className="text-[9px] text-indigo-600 font-bold mb-0.5">¥{(maintCost/10000).toFixed(1)}万</span>
                       <div className="w-full bg-indigo-400 rounded-t transition-all duration-500" style={{ height: `${maintenanceCostHeight}%` }}></div>
-                      <span className="text-[8px] text-gray-400">维保成本</span>
+                      <span className="text-[8px] text-gray-400">5年维保</span>
                     </div>
                     <div className="flex-1 flex flex-col items-center gap-1 h-full justify-end">
+                      <span className="text-[9px] text-teal-600 font-bold mb-0.5">¥{(timeCost/10000).toFixed(1)}万</span>
                       <div className="w-full bg-teal-400 rounded-t transition-all duration-500" style={{ height: `${timeCostHeight}%` }}></div>
-                      <span className="text-[8px] text-gray-400">时间成本</span>
+                      <span className="text-[8px] text-gray-400">时间/风险</span>
                     </div>
                   </div>
                 </div>
