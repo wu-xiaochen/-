@@ -91,114 +91,56 @@ const PreJourneyCard = ({ onConfirm }: { onConfirm: () => void }) => (
   </Card>
 );
 
-const Step1Card = ({ onConfirm }: { onConfirm: () => void }) => {
-  const [step, setStep] = useState(0);
-  const [isInferring, setIsInferring] = useState(false);
+const ChatPromptHouseholds = ({ onSelect }: { onSelect: (val: string) => void }) => {
+  const [selected, setSelected] = useState(false);
+  return (
+    <div>
+      <p className="text-sm mb-2">收到！为老旧小区改造采购10台燃气调压箱。为了帮您精准推算设备参数，请问<strong>每个调压箱大约覆盖多少户居民</strong>？</p>
+      {!selected && (
+        <div className="flex gap-2 mt-2">
+          <ButtonOutline color="blue" onClick={() => { setSelected(true); onSelect("约300户"); }}>约300户</ButtonOutline>
+          <ButtonOutline color="blue" onClick={() => { setSelected(true); onSelect("约500户"); }}>约500户</ButtonOutline>
+        </div>
+      )}
+    </div>
+  );
+};
 
-  const handleNextStep = () => {
-    setIsInferring(true);
-    setTimeout(() => {
-      setIsInferring(false);
-      setStep(step + 1);
-    }, 1200);
-  };
+const ChatPromptUsage = ({ onSelect }: { onSelect: (val: string) => void }) => {
+  const [selected, setSelected] = useState(false);
+  return (
+    <div>
+      <p className="text-sm mb-2">好的。请问这些居民的用气场景是<strong>仅做饭</strong>，还是<strong>做饭+壁挂炉采暖</strong>？这会直接影响流量测算。</p>
+      {!selected && (
+        <div className="flex gap-2 mt-2">
+          <ButtonOutline color="blue" onClick={() => { setSelected(true); onSelect("仅做饭"); }}>仅做饭</ButtonOutline>
+          <ButtonOutline color="blue" onClick={() => { setSelected(true); onSelect("做饭+采暖"); }}>做饭+采暖</ButtonOutline>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const Step1ConfirmCard = ({ households, usage, onConfirm }: { households: string, usage: string, onConfirm: () => void }) => {
+  const [confirmed, setConfirmed] = useState(false);
+  const flowRate = usage === "做饭+采暖" ? (households === "约500户" ? "≥ 2000 Nm³/h" : "≥ 1200 Nm³/h") : (households === "约500户" ? "≥ 1000 Nm³/h" : "≥ 600 Nm³/h");
 
   return (
     <Card className="mt-2">
-      <div className="p-4 border-b border-gray-50 flex justify-between items-start">
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-blue-500"><Lightbulb size={14} /></div>
-          <span className="font-semibold text-gray-800 text-sm">分析初步需求</span>
-        </div>
-        <ButtonOutline color="indigo">去调整 <ChevronRight size={12} /></ButtonOutline>
+      <div className="p-3 border-b border-gray-50 flex items-center gap-2">
+        <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-blue-500"><Cpu size={14} /></div>
+        <span className="font-semibold text-gray-800 text-sm">参数推演结果</span>
       </div>
-      <div className="p-4">
-        <div className="flex items-center justify-between mb-4">
-          <div className="bg-blue-50 text-blue-600 px-3 py-1.5 rounded-full text-xs font-medium">燃气调压箱采购需求</div>
-          <Menu size={16} className="text-gray-400" />
+      <div className="p-4 space-y-3 text-xs">
+        <div className="flex justify-between items-center"><span className="text-gray-500">推算流量需求:</span><span className="text-green-600 bg-green-50 px-2 py-0.5 rounded font-medium">{flowRate}</span></div>
+        <div className="flex justify-between items-center"><span className="text-gray-500">默认进口压力:</span><span className="text-gray-800">0.2~0.4 MPa (中压A)</span></div>
+        <div className="flex justify-between items-center"><span className="text-gray-500">默认出口压力:</span><span className="text-gray-800">2.0 kPa (低压)</span></div>
+        <div className="bg-blue-50 text-blue-800 p-2 rounded text-[10px] mt-2 leading-relaxed">
+          💡 提示：基于“老旧小区”场景，系统已自动匹配市政中压管网降压至居民低压的标准压力参数。
         </div>
-        
-        <Accordion title="需智思考与推理过程" defaultOpen={true}>
-          <div className="space-y-2 text-xs text-gray-500 font-mono">
-            <div className="flex gap-2"><span className="text-blue-400">▶</span><span>解析输入意图：老旧小区改造、冬季极寒、10台调压箱</span></div>
-            <div className="flex gap-2"><span className="text-blue-400">▶</span><span>调用【燃气调压箱品类本体】进行特征对齐...</span></div>
-            <div className="flex gap-2"><span className="text-orange-400">⚠</span><span>发现缺失关键参数：进口压力、出口压力、总体流量</span></div>
-            {step >= 1 && <div className="flex gap-2"><span className="text-blue-400">▶</span><span>根据“老旧小区”标签，推断气源可能为中压市政管网，推测进口压力为中压A或B。</span></div>}
-            {step >= 2 && <div className="flex gap-2"><span className="text-blue-400">▶</span><span>根据“500户、做饭+供暖”推算：单户峰值流量约2.5Nm³/h，总流量需求约 1250 Nm³/h。</span></div>}
-            {step >= 2 && <div className="flex gap-2"><span className="text-green-500">✔</span><span>参数补全完毕，准备生成初步结构化需求说明书。</span></div>}
-          </div>
-        </Accordion>
-
-        <div className="mt-4 mb-4">
-          <h4 className="text-xs font-semibold text-gray-800 mb-2">初步物资需求要求</h4>
-          
-          <Accordion title="场景与工况" count={3} defaultOpen={false}>
-            <div className="space-y-2 text-xs">
-              <div className="flex justify-between"><span className="text-gray-500">应用场景:</span><span className="text-gray-800">老旧小区改造</span></div>
-              <div className="flex justify-between"><span className="text-gray-500">用户类型:</span><span className="text-gray-800">居民用气</span></div>
-              <div className="flex justify-between"><span className="text-gray-500">特殊工况:</span><span className="text-blue-600 font-medium bg-blue-50 px-1 rounded">冬季极寒易结冰</span></div>
-            </div>
-          </Accordion>
-
-          <Accordion title="核心参数" count={4} defaultOpen={true} warning={step < 2}>
-            <div className="space-y-2 text-xs">
-              <div className="flex justify-between"><span className="text-gray-500">采购数量:</span><span className="text-gray-800">10台</span></div>
-              
-              {step === 0 && (
-                <>
-                  <div className="flex justify-between items-center"><span className="text-gray-500">进口压力:</span><span className="text-orange-500 bg-orange-50 px-2 py-0.5 rounded flex items-center gap-1"><AlertCircle size={10}/> 待确认</span></div>
-                  <div className="flex justify-between items-center"><span className="text-gray-500">出口压力:</span><span className="text-orange-500 bg-orange-50 px-2 py-0.5 rounded flex items-center gap-1"><AlertCircle size={10}/> 待确认</span></div>
-                  <div className="flex justify-between items-center"><span className="text-gray-500">流量需求:</span><span className="text-orange-500 bg-orange-50 px-2 py-0.5 rounded flex items-center gap-1"><AlertCircle size={10}/> 待确认</span></div>
-                </>
-              )}
-              
-              {step >= 1 && (
-                <>
-                  <div className="flex justify-between items-center"><span className="text-gray-500">进口压力:</span><span className="text-green-600 bg-green-50 px-2 py-0.5 rounded">0.2~0.4 MPa (中压A)</span></div>
-                  <div className="flex justify-between items-center"><span className="text-gray-500">出口压力:</span><span className="text-green-600 bg-green-50 px-2 py-0.5 rounded">2.0 kPa (低压)</span></div>
-                  {step === 1 ? (
-                    <div className="flex justify-between items-center"><span className="text-gray-500">流量需求:</span><span className="text-orange-500 bg-orange-50 px-2 py-0.5 rounded flex items-center gap-1"><AlertCircle size={10}/> 待确认</span></div>
-                  ) : (
-                    <div className="flex justify-between items-center"><span className="text-gray-500">流量需求:</span><span className="text-green-600 bg-green-50 px-2 py-0.5 rounded">≥ 1250 Nm³/h</span></div>
-                  )}
-                </>
-              )}
-            </div>
-          </Accordion>
-        </div>
-
-        <AnimatePresence mode="wait">
-          {isInferring ? (
-            <motion.div key="inferring" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex justify-center py-4">
-              <div className="flex items-center gap-2 text-blue-500 text-xs">
-                <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-                正在结合品类本体进行推演...
-              </div>
-            </motion.div>
-          ) : step === 0 ? (
-            <motion.div key="step0" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
-              <div className="bg-blue-50 border border-blue-100 rounded-lg p-3 mb-4 text-xs text-blue-800">
-                <p className="mb-2">检测到缺失压力参数。根据“老旧小区”标签，通常接入市政中压管网，降压至居民低压使用。</p>
-                <p className="font-semibold">是否确认进出口压力为：中压A (0.2~0.4MPa) 转 低压 (2.0kPa)？</p>
-              </div>
-              <ButtonOutline className="w-full justify-center mb-3" color="blue" onClick={handleNextStep}>确认压力标准</ButtonOutline>
-            </motion.div>
-          ) : step === 1 ? (
-            <motion.div key="step1" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
-              <div className="bg-blue-50 border border-blue-100 rounded-lg p-3 mb-4 text-xs text-blue-800">
-                <p className="mb-2">还缺少总体流量需求。为了帮您推算，请问该小区大约有多少户居民？是否采用燃气壁挂炉供暖？</p>
-                <div className="flex gap-2 mt-2">
-                  <span className="bg-white px-2 py-1 rounded border border-blue-200 cursor-pointer hover:bg-blue-100" onClick={handleNextStep}>约500户，做饭+供暖</span>
-                  <span className="bg-white px-2 py-1 rounded border border-blue-200 cursor-pointer hover:bg-blue-100" onClick={handleNextStep}>约300户，仅做饭</span>
-                </div>
-              </div>
-            </motion.div>
-          ) : (
-            <motion.div key="step2" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-              <ButtonSolid onClick={onConfirm}>确认初步需求</ButtonSolid>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {!confirmed && (
+          <ButtonSolid className="w-full mt-2" onClick={() => { setConfirmed(true); onConfirm(); }}>确认初步技术参数</ButtonSolid>
+        )}
       </div>
     </Card>
   );
@@ -665,19 +607,25 @@ export default function App() {
   const startJourney = () => {
     simulateAI(<div><p className="text-sm mb-2">您好！我是需智。我察觉到您的项目进度有了新动向。</p><PreJourneyCard onConfirm={() => {
       addMessage('user', "是的，我要买10个燃气调压箱，居民小区改造用，最近冬天老降温，怕冻坏了影响供气，要尽快到货。");
-      simulateAI(<div><p className="text-sm mb-2">好的，接下来我将基于收集到的信息，帮你分析清晰的物资信息。</p><Step1Card onConfirm={() => {
-        addMessage('user', "确认初步需求");
-        simulateAI(<div><p className="text-sm mb-2">好的，你已确认初步需求，现在为你进行物资机理能力测算并生成初步需求说明。</p><Step2Card onNext={() => {
-          addMessage('user', "查看3D仿真与个性化调节");
-          simulateAI(<div><p className="text-sm mb-2">已为您生成3D数字孪生视图，并扫描全国供应链产能库。请根据实际预算和工期，拖拽滑块进行个性化调节。</p><Step3Card onNext={(config) => {
-            addMessage('user', "确认最终方案");
-            simulateAI(<div><p className="text-sm mb-2">方案已锁定，正在为您生成最终的《采购需求说明书》...</p><Step4Card config={config} onNext={() => {
-              addMessage('user', "共识并确认采购需求");
-              simulateAI(<div><p className="text-sm mb-2">需求已确认并归档！您可以随时导出《采购需求说明书》进行后续采购流程。基于您的需求，已生成供应商能力标尺。</p><Step6Card config={config} /></div>);
+      simulateAI(<ChatPromptHouseholds onSelect={(households) => {
+        addMessage('user', households);
+        simulateAI(<ChatPromptUsage onSelect={(usage) => {
+          addMessage('user', usage);
+          simulateAI(<div><p className="text-sm mb-2">明白。基于您的实际场景，系统已为您推算出核心技术参数。</p><Step1ConfirmCard households={households} usage={usage} onConfirm={() => {
+            addMessage('user', "确认初步技术参数");
+            simulateAI(<div><p className="text-sm mb-2">参数已锁定！正在为您进行物资机理能力测算与风险规避...</p><Step2Card onNext={() => {
+              addMessage('user', "查看3D仿真与个性化调节");
+              simulateAI(<div><p className="text-sm mb-2">已为您生成3D数字孪生视图，并扫描全国供应链产能库。请根据实际预算和工期，拖拽滑块进行个性化调节。</p><Step3Card onNext={(config) => {
+                addMessage('user', "确认最终方案");
+                simulateAI(<div><p className="text-sm mb-2">方案已锁定，正在为您生成最终的《采购需求说明书》...</p><Step4Card config={config} onNext={() => {
+                  addMessage('user', "共识并确认采购需求");
+                  simulateAI(<div><p className="text-sm mb-2">需求已确认并归档！您可以随时导出《采购需求说明书》进行后续采购流程。基于您的需求，已生成供应商能力标尺。</p><Step6Card config={config} /></div>);
+                }} /></div>);
+              }} /></div>);
             }} /></div>);
           }} /></div>);
-        }} /></div>);
-      }} /></div>);
+        }} />);
+      }} />);
     }} /></div>);
   };
 
