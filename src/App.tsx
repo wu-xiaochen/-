@@ -105,7 +105,7 @@ const Step1Card = ({ onConfirm }: { onConfirm: () => void }) => {
       <div className="p-4 border-b border-gray-50 flex justify-between items-start">
         <div className="flex items-center gap-2">
           <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-blue-500"><Lightbulb size={14} /></div>
-          <span className="font-semibold text-gray-800 text-sm">分析清晰的物资信息</span>
+          <span className="font-semibold text-gray-800 text-sm">分析初步需求</span>
         </div>
         <ButtonOutline color="indigo">去调整 <ChevronRight size={12} /></ButtonOutline>
       </div>
@@ -122,12 +122,12 @@ const Step1Card = ({ onConfirm }: { onConfirm: () => void }) => {
             <div className="flex gap-2"><span className="text-orange-400">⚠</span><span>发现缺失关键参数：进口压力、出口压力、总体流量</span></div>
             {step >= 1 && <div className="flex gap-2"><span className="text-blue-400">▶</span><span>根据“老旧小区”标签，推断气源可能为中压市政管网，推测进口压力为中压A或B。</span></div>}
             {step >= 2 && <div className="flex gap-2"><span className="text-blue-400">▶</span><span>根据“500户、做饭+供暖”推算：单户峰值流量约2.5Nm³/h，总流量需求约 1250 Nm³/h。</span></div>}
-            {step >= 2 && <div className="flex gap-2"><span className="text-green-500">✔</span><span>参数补全完毕，准备生成物资卡片。</span></div>}
+            {step >= 2 && <div className="flex gap-2"><span className="text-green-500">✔</span><span>参数补全完毕，准备生成初步结构化需求说明书。</span></div>}
           </div>
         </Accordion>
 
         <div className="mt-4 mb-4">
-          <h4 className="text-xs font-semibold text-gray-800 mb-2">清晰的物资需求要求</h4>
+          <h4 className="text-xs font-semibold text-gray-800 mb-2">初步物资需求要求</h4>
           
           <Accordion title="场景与工况" count={3} defaultOpen={false}>
             <div className="space-y-2 text-xs">
@@ -192,7 +192,7 @@ const Step1Card = ({ onConfirm }: { onConfirm: () => void }) => {
             </motion.div>
           ) : (
             <motion.div key="step2" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-              <ButtonSolid onClick={onConfirm}>确认基础物资信息</ButtonSolid>
+              <ButtonSolid onClick={onConfirm}>确认初步需求</ButtonSolid>
             </motion.div>
           )}
         </AnimatePresence>
@@ -205,170 +205,184 @@ const Step2Card = ({ onNext }: { onNext: () => void }) => (
   <div className="space-y-3 mt-2">
     <Card>
       <div className="p-3 flex items-center justify-between">
-        <div className="flex items-center gap-2"><CheckCircle size={16} className="text-blue-500" /><span className="text-sm text-gray-800 font-medium">已完成&lt;基础物资信息&gt;测算与风险规避</span></div>
+        <div className="flex items-center gap-2"><CheckCircle size={16} className="text-blue-500" /><span className="text-sm text-gray-800 font-medium">已完成&lt;初步需求&gt;测算与风险规避</span></div>
         <ChevronDown size={16} className="text-gray-400" />
       </div>
     </Card>
     <Card>
       <div className="p-4 border-b border-gray-50 flex justify-between items-start">
-        <div className="flex items-center gap-2"><div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-blue-500"><ShieldCheck size={14} /></div><span className="font-semibold text-gray-800 text-sm">最优物资配置方案</span></div>
+        <div className="flex items-center gap-2"><div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-blue-500"><ClipboardList size={14} /></div><span className="font-semibold text-gray-800 text-sm">初步结构化需求说明书</span></div>
       </div>
       <div className="p-4">
         <div className="mb-4">
           <h4 className="text-xs font-semibold text-gray-800 mb-2">物资机理能力测算</h4>
           <div className="bg-indigo-50 border border-indigo-100 rounded-lg p-3 text-xs text-indigo-800 leading-relaxed"><span className="font-semibold">❄️ 极寒结冰风险拦截：</span>识别到“冬季极寒”工况，普通箱体易发生冷凝结冰导致压力失控。系统已强制为主设备增配 <span className="font-bold text-indigo-600">电伴热保温模块</span>。</div>
         </div>
-        <div className="mb-4">
-          <h4 className="text-xs font-semibold text-gray-800 mb-2">隐性配套补全</h4>
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-xs text-gray-700 bg-gray-50 p-2 rounded"><Cpu size={14} className="text-blue-500" /> 自动补全：防爆可燃气体探测器</div>
-            <div className="flex items-center gap-2 text-xs text-gray-700 bg-gray-50 p-2 rounded"><Activity size={14} className="text-blue-500" /> 自动补全：智能压力监测终端</div>
-            <div className="flex items-center gap-2 text-xs text-gray-700 bg-gray-50 p-2 rounded"><FileText size={14} className="text-blue-500" /> 服务补全：狭小空间吊装指导</div>
+        
+        <Accordion title="基础物资属性规格参数" defaultOpen={true}>
+          <div className="space-y-2 text-xs">
+            <div className="flex justify-between"><span className="text-gray-500">物资名称:</span><span className="text-gray-800 font-medium">燃气调压箱</span></div>
+            <div className="flex justify-between"><span className="text-gray-500">采购数量:</span><span className="text-gray-800 font-medium">10 台</span></div>
+            <div className="flex justify-between"><span className="text-gray-500">设计工作压力:</span><span className="text-gray-800 font-medium">0.4 MPa 转 2.0 kPa</span></div>
+            <div className="flex justify-between"><span className="text-gray-500">稳态调压精度:</span><span className="text-blue-600 font-medium bg-blue-50 px-1 rounded">≤±10%</span></div>
+            <div className="flex justify-between"><span className="text-gray-500">运行噪音限制:</span><span className="text-gray-800">≤55dB (近居民区)</span></div>
           </div>
-        </div>
-        <Accordion title="TCO 总拥有成本算账" defaultOpen={true}>
+        </Accordion>
+
+        <Accordion title="特种工况与配套要求" defaultOpen={false}>
+          <div className="space-y-2 text-xs">
+            <div className="flex justify-between"><span className="text-gray-500">防冷凝模块:</span><span className="text-indigo-600 font-medium">防冷凝加热型调压箱</span></div>
+            <div className="flex justify-between"><span className="text-gray-500">安全监测配套:</span><span className="text-gray-800">防爆可燃气体探测器、智能压力监测终端</span></div>
+            <div className="flex justify-between"><span className="text-gray-500">特种服务:</span><span className="text-gray-800">狭小空间吊装指导</span></div>
+          </div>
+        </Accordion>
+
+        <Accordion title="初步 TCO 与交付评估" defaultOpen={true}>
           <div className="space-y-3 text-xs">
             <div className="flex justify-between items-center"><span className="text-gray-500">初期采购成本:</span><span className="text-indigo-500 font-medium">+15% (增配保温模块)</span></div>
             <div className="flex justify-between items-center"><span className="text-gray-500">十年维保成本:</span><span className="text-green-600 font-medium">-30% (规避冻裂风险)</span></div>
+            <div className="flex justify-between items-center"><span className="text-gray-500">预计交期:</span><span className="text-gray-800 font-medium">15 天</span></div>
             <div className="h-px bg-gray-100 my-1"></div>
             <div className="flex justify-between items-center font-semibold text-sm"><span className="text-gray-800">全生命周期总账:</span><span className="text-green-600">绝对算赢 (节省12%)</span></div>
           </div>
         </Accordion>
-        <ButtonSolid onClick={onNext} className="mt-4">查看3D仿真与市场分析</ButtonSolid>
+
+        <Accordion title="物资质量判别方案" defaultOpen={false}>
+          <div className="space-y-2 text-xs">
+            <div className="flex justify-between"><span className="text-gray-500">外观检查:</span><span className="text-gray-800">漆膜厚度≥80μm，无划痕脱落，箱体无变形</span></div>
+            <div className="flex justify-between"><span className="text-gray-500">性能测试:</span><span className="text-gray-800">出厂前需提供 -20℃ 低温环境模拟测试报告及气密性测试报告</span></div>
+            <div className="flex justify-between"><span className="text-gray-500">资质核验:</span><span className="text-gray-800">防爆合格证、特种设备制造许可证、核心部件材质单</span></div>
+          </div>
+        </Accordion>
+
+        <ButtonSolid onClick={onNext} className="mt-4">查看3D仿真与个性化调节</ButtonSolid>
       </div>
     </Card>
   </div>
 );
 
-const Step3Card = ({ onNext }: { onNext: () => void }) => (
-  <Card className="mt-2">
-    <div className="p-4 border-b border-gray-50 flex justify-between items-start">
-      <div className="flex items-center gap-2"><div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-blue-500"><Box size={14} /></div><span className="font-semibold text-gray-800 text-sm">3D仿真呈现与共识</span></div>
-    </div>
-    <div className="p-4">
-      <div className="w-full h-56 bg-gradient-to-br from-slate-100 to-slate-200 rounded-lg mb-4 relative flex items-center justify-center border border-slate-200 overflow-hidden" style={{ perspective: '800px' }}>
-        <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'radial-gradient(#cbd5e1 1px, transparent 1px)', backgroundSize: '16px 16px' }}></div>
-        <motion.div 
-          animate={{ rotateY: [0, 360] }} 
-          transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-          style={{ transformStyle: 'preserve-3d', width: '120px', height: '160px', position: 'relative' }}
-        >
-          {/* Main Cabinet Body */}
-          <div className="absolute inset-0 bg-slate-200 border-2 border-slate-400 flex flex-col items-center justify-start shadow-sm rounded-sm" style={{ transform: 'translateZ(40px)' }}>
-            {/* Doors */}
-            <div className="w-full h-full flex">
-              <div className="w-1/2 h-full border-r border-slate-400 flex flex-col items-center justify-center relative">
-                <div className="w-1 h-4 bg-slate-500 absolute right-1 top-1/2 transform -translate-y-1/2 rounded-full"></div>
-                {/* Vents */}
-                <div className="w-8 h-2 bg-slate-400 rounded-full mt-2"></div>
-                <div className="w-8 h-2 bg-slate-400 rounded-full mt-1"></div>
-              </div>
-              <div className="w-1/2 h-full flex flex-col items-center justify-center relative">
-                <div className="w-1 h-4 bg-slate-500 absolute left-1 top-1/2 transform -translate-y-1/2 rounded-full"></div>
-                {/* Vents */}
-                <div className="w-8 h-2 bg-slate-400 rounded-full mt-2"></div>
-                <div className="w-8 h-2 bg-slate-400 rounded-full mt-1"></div>
-              </div>
-            </div>
-            {/* Base */}
-            <div className="absolute bottom-0 w-full h-6 bg-slate-600 border-t-2 border-slate-700"></div>
-          </div>
-          
-          {/* Back */}
-          <div className="absolute inset-0 bg-slate-300 border-2 border-slate-400 rounded-sm" style={{ transform: 'rotateY(180deg) translateZ(40px)' }}></div>
-          {/* Left */}
-          <div className="absolute inset-0 bg-slate-100 border-2 border-slate-400" style={{ width: '80px', left: '20px', transform: 'rotateY(-90deg) translateZ(60px)' }}></div>
-          {/* Right */}
-          <div className="absolute inset-0 bg-slate-300 border-2 border-slate-400" style={{ width: '80px', left: '20px', transform: 'rotateY(90deg) translateZ(60px)' }}></div>
-          {/* Top (Roof with slight slant) */}
-          <div className="absolute inset-0 bg-slate-100 border-2 border-slate-400" style={{ height: '80px', top: '-10px', transform: 'rotateX(90deg) translateZ(60px) scale(1.05)' }}></div>
-          {/* Bottom */}
-          <div className="absolute inset-0 bg-slate-800 border-2 border-slate-900" style={{ height: '80px', top: '80px', transform: 'rotateX(-90deg) translateZ(80px)' }}></div>
-          
-          {/* Internal Pipes (Visible on sides/top for effect) */}
-          <div className="absolute w-4 h-24 bg-yellow-500 rounded-full" style={{ left: '-10px', top: '20px', transform: 'translateZ(0px) rotateY(-90deg)' }}></div>
-          <div className="absolute w-4 h-24 bg-blue-500 rounded-full" style={{ right: '-10px', top: '20px', transform: 'translateZ(0px) rotateY(90deg)' }}></div>
+export interface ConfigState {
+  days: number;
+  material: number;
+  insulation: 'basic' | 'advanced';
+  telemetry: 'basic' | 'full';
+}
 
-          {/* Labels that rotate with it */}
-          <div className="absolute -top-6 -right-16 bg-blue-900 text-white text-[10px] px-2 py-1 rounded whitespace-nowrap shadow-md flex items-center gap-1" style={{ transform: 'translateZ(50px)' }}><Activity size={10}/> 智能远传终端</div>
-          <div className="absolute bottom-8 -left-12 bg-teal-50 text-teal-700 border border-teal-200 text-[10px] px-2 py-1 rounded whitespace-nowrap shadow-sm flex items-center gap-1" style={{ transform: 'translateZ(50px)' }}><Zap size={10}/> 防爆电伴热</div>
-        </motion.div>
-      </div>
-      <div className="bg-blue-50 border border-blue-100 rounded-lg p-3 mb-4 flex gap-3 items-start">
-        <Truck size={16} className="text-blue-500 mt-0.5 shrink-0" />
-        <p className="text-xs text-blue-800 leading-relaxed"><span className="font-semibold">市场供给建议：</span>该定制方案当前市面产能充足，预计有 <span className="font-bold">5家</span> 优质供应商可接单；若当前下单，预计 <span className="font-bold">15天内</span> 可全部到货。</p>
-      </div>
-      <ButtonSolid onClick={onNext}>个性化调节方案</ButtonSolid>
-    </div>
-  </Card>
-);
-
-const Step4Card = ({ onNext }: { onNext: (days: number) => void }) => {
-  const [days, setDays] = useState(15);
-  const [material, setMaterial] = useState(100);
+const Step3Card = ({ onNext }: { onNext: (config: ConfigState) => void }) => {
+  const [config, setConfig] = useState<ConfigState>({ days: 15, material: 100, insulation: 'advanced', telemetry: 'full' });
   const [isCalculating, setIsCalculating] = useState(false);
-  const [showResult, setShowResult] = useState(false);
-  const [savedConfigs, setSavedConfigs] = useState<{id: string, days: number, material: number, tco: string}[]>([]);
+  const [showResult, setShowResult] = useState(true);
+  const [savedConfigs, setSavedConfigs] = useState<(ConfigState & {id: string})[]>([]);
 
-  const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>, setter: React.Dispatch<React.SetStateAction<number>>) => {
-    setter(Number(e.target.value));
+  const handleChange = (key: keyof ConfigState, value: any) => {
+    setConfig(prev => ({ ...prev, [key]: value }));
     setIsCalculating(true);
     setShowResult(false);
     setTimeout(() => { setIsCalculating(false); setShowResult(true); }, 800);
   };
 
   const handleSaveConfig = () => {
-    const newConfig = {
-      id: Date.now().toString(),
-      days,
-      material,
-      tco: material > 50 ? '-12%' : '-5%'
-    };
-    setSavedConfigs([...savedConfigs, newConfig]);
+    setSavedConfigs([...savedConfigs, { ...config, id: Date.now().toString() }]);
   };
 
-  const loadConfig = (config: {days: number, material: number}) => {
-    setDays(config.days);
-    setMaterial(config.material);
+  const loadConfig = (c: ConfigState) => {
+    setConfig({ days: c.days, material: c.material, insulation: c.insulation, telemetry: c.telemetry });
     setIsCalculating(true);
     setShowResult(false);
     setTimeout(() => { setIsCalculating(false); setShowResult(true); }, 500);
   };
 
+  const initialCostHeight = config.material > 50 ? 60 : 40 + (config.insulation === 'advanced' ? 10 : 0) + (config.telemetry === 'full' ? 10 : 0);
+  const maintenanceCostHeight = config.material > 50 ? 30 : 60 - (config.insulation === 'advanced' ? 20 : 0) - (config.telemetry === 'full' ? 10 : 0);
+  const timeCostHeight = config.days < 15 ? 80 : 40;
+
   return (
     <Card className="mt-2">
       <div className="p-4 border-b border-gray-50 flex justify-between items-start">
-        <div className="flex items-center gap-2"><div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-blue-500"><Sliders size={14} /></div><span className="font-semibold text-gray-800 text-sm">个性化动态调节</span></div>
+        <div className="flex items-center gap-2"><div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-blue-500"><Box size={14} /></div><span className="font-semibold text-gray-800 text-sm">3D仿真与个性化调节</span></div>
       </div>
       <div className="p-4">
-        
+        <div className="w-full h-56 bg-gradient-to-br from-slate-100 to-slate-200 rounded-lg mb-4 relative flex items-center justify-center border border-slate-200 overflow-hidden" style={{ perspective: '800px' }}>
+          <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'radial-gradient(#cbd5e1 1px, transparent 1px)', backgroundSize: '16px 16px' }}></div>
+          <motion.div 
+            animate={{ rotateY: [0, 360] }} 
+            transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+            style={{ transformStyle: 'preserve-3d', width: '120px', height: '160px', position: 'relative' }}
+          >
+            <div className={`absolute inset-0 ${config.material > 50 ? 'bg-slate-200' : 'bg-zinc-300'} border-2 border-slate-400 flex flex-col items-center justify-start shadow-sm rounded-sm`} style={{ transform: 'translateZ(40px)' }}>
+              <div className="w-full h-full flex">
+                <div className="w-1/2 h-full border-r border-slate-400 flex flex-col items-center justify-center relative">
+                  <div className="w-1 h-4 bg-slate-500 absolute right-1 top-1/2 transform -translate-y-1/2 rounded-full"></div>
+                  <div className="w-8 h-2 bg-slate-400 rounded-full mt-2"></div>
+                  <div className="w-8 h-2 bg-slate-400 rounded-full mt-1"></div>
+                </div>
+                <div className="w-1/2 h-full flex flex-col items-center justify-center relative">
+                  <div className="w-1 h-4 bg-slate-500 absolute left-1 top-1/2 transform -translate-y-1/2 rounded-full"></div>
+                  <div className="w-8 h-2 bg-slate-400 rounded-full mt-2"></div>
+                  <div className="w-8 h-2 bg-slate-400 rounded-full mt-1"></div>
+                </div>
+              </div>
+              <div className="absolute bottom-0 w-full h-6 bg-slate-600 border-t-2 border-slate-700"></div>
+            </div>
+            
+            <div className={`absolute inset-0 ${config.material > 50 ? 'bg-slate-300' : 'bg-zinc-400'} border-2 border-slate-400 rounded-sm`} style={{ transform: 'rotateY(180deg) translateZ(40px)' }}></div>
+            <div className={`absolute inset-0 ${config.material > 50 ? 'bg-slate-100' : 'bg-zinc-200'} border-2 border-slate-400`} style={{ width: '80px', left: '20px', transform: 'rotateY(-90deg) translateZ(60px)' }}></div>
+            <div className={`absolute inset-0 ${config.material > 50 ? 'bg-slate-300' : 'bg-zinc-400'} border-2 border-slate-400`} style={{ width: '80px', left: '20px', transform: 'rotateY(90deg) translateZ(60px)' }}></div>
+            <div className={`absolute inset-0 ${config.material > 50 ? 'bg-slate-100' : 'bg-zinc-200'} border-2 border-slate-400`} style={{ height: '80px', top: '-10px', transform: 'rotateX(90deg) translateZ(60px) scale(1.05)' }}></div>
+            <div className="absolute inset-0 bg-slate-800 border-2 border-slate-900" style={{ height: '80px', top: '80px', transform: 'rotateX(-90deg) translateZ(80px)' }}></div>
+            
+            <div className="absolute w-4 h-24 bg-yellow-500 rounded-full" style={{ left: '-10px', top: '20px', transform: 'translateZ(0px) rotateY(-90deg)' }}></div>
+            <div className="absolute w-4 h-24 bg-blue-500 rounded-full" style={{ right: '-10px', top: '20px', transform: 'translateZ(0px) rotateY(90deg)' }}></div>
+
+            {config.telemetry === 'full' && <div className="absolute -top-6 -right-16 bg-blue-900 text-white text-[10px] px-2 py-1 rounded whitespace-nowrap shadow-md flex items-center gap-1" style={{ transform: 'translateZ(50px)' }}><Activity size={10}/> 5G全量远传终端</div>}
+            {config.insulation === 'advanced' && <div className="absolute bottom-8 -left-12 bg-teal-50 text-teal-700 border border-teal-200 text-[10px] px-2 py-1 rounded whitespace-nowrap shadow-sm flex items-center gap-1" style={{ transform: 'translateZ(50px)' }}><Zap size={10}/> 防爆电伴热</div>}
+          </motion.div>
+        </div>
+
+        <div className="space-y-4 mb-4">
+          <div>
+            <div className="flex justify-between items-center mb-1"><label className="text-xs font-semibold text-gray-700">交期要求</label><span className="text-xs font-bold text-blue-600">{config.days} 天</span></div>
+            <input type="range" min="7" max="30" value={config.days} onChange={(e) => handleChange('days', Number(e.target.value))} className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-500" />
+            <div className="flex justify-between text-[10px] text-gray-400 mt-1"><span>加急 (7天)</span><span>常规 (30天)</span></div>
+          </div>
+          <div>
+            <div className="flex justify-between items-center mb-1"><label className="text-xs font-semibold text-gray-700">管件材质</label><span className="text-xs font-bold text-blue-600">{config.material > 50 ? '304不锈钢' : '碳钢防腐'}</span></div>
+            <input type="range" min="0" max="100" value={config.material} onChange={(e) => handleChange('material', Number(e.target.value))} className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-500" />
+            <div className="flex justify-between text-[10px] text-gray-400 mt-1"><span>经济平替</span><span>高标原厂</span></div>
+          </div>
+          <div className="flex gap-2">
+            <div className="flex-1">
+              <label className="text-xs font-semibold text-gray-700 block mb-1">防冻保温等级</label>
+              <select value={config.insulation} onChange={(e) => handleChange('insulation', e.target.value)} className="w-full text-xs border border-gray-200 rounded p-1.5 bg-gray-50 outline-none focus:border-blue-400">
+                <option value="basic">标准保温棉</option>
+                <option value="advanced">智能防爆电伴热</option>
+              </select>
+            </div>
+            <div className="flex-1">
+              <label className="text-xs font-semibold text-gray-700 block mb-1">远传监控</label>
+              <select value={config.telemetry} onChange={(e) => handleChange('telemetry', e.target.value)} className="w-full text-xs border border-gray-200 rounded p-1.5 bg-gray-50 outline-none focus:border-blue-400">
+                <option value="basic">基础表计(人工抄表)</option>
+                <option value="full">5G全量数据远传</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
         {savedConfigs.length > 0 && (
-          <div className="mb-5">
+          <div className="mb-4">
             <h4 className="text-xs font-semibold text-gray-700 mb-2 flex items-center gap-1"><Bookmark size={12} className="text-blue-500"/> 已存偏好组合</h4>
             <div className="flex gap-2 overflow-x-auto pb-2">
               {savedConfigs.map((c, i) => (
                 <div key={c.id} onClick={() => loadConfig(c)} className="shrink-0 bg-blue-50 border border-blue-100 rounded p-2 text-[10px] cursor-pointer hover:bg-blue-100 transition-colors">
                   <div className="font-semibold text-blue-800 mb-1">组合 {i + 1}</div>
-                  <div className="text-gray-600">交期: {c.days}天</div>
-                  <div className="text-gray-600">材质: {c.material > 50 ? '标准' : '经济'}</div>
+                  <div className="text-gray-600">{c.days}天 | {c.material > 50 ? '不锈钢' : '碳钢'}</div>
                 </div>
               ))}
             </div>
           </div>
         )}
 
-        <div className="mb-5">
-          <div className="flex justify-between items-center mb-2"><label className="text-xs font-semibold text-gray-700">交期要求 (天)</label><span className="text-xs font-bold text-blue-600">{days} 天</span></div>
-          <input type="range" min="7" max="30" value={days} onChange={(e) => handleSliderChange(e, setDays)} className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-500" />
-          <div className="flex justify-between text-[10px] text-gray-400 mt-1"><span>加急 (7天)</span><span>常规 (30天)</span></div>
-        </div>
-        <div className="mb-5">
-          <div className="flex justify-between items-center mb-2"><label className="text-xs font-semibold text-gray-700">非核心管件材质</label><span className="text-xs font-bold text-blue-600">{material > 50 ? '标准级 (304不锈钢)' : '经济级 (碳钢防腐)'}</span></div>
-          <input type="range" min="0" max="100" value={material} onChange={(e) => handleSliderChange(e, setMaterial)} className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-500" />
-          <div className="flex justify-between text-[10px] text-gray-400 mt-1"><span>经济平替</span><span>高标原厂</span></div>
-        </div>
-        
-        <div className="h-32 mb-4">
+        <div className="h-40 mb-4">
           <AnimatePresence mode="wait">
             {isCalculating && (
               <motion.div key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="h-full flex flex-col items-center justify-center gap-2 text-blue-500">
@@ -383,44 +397,35 @@ const Step4Card = ({ onNext }: { onNext: (days: number) => void }) => {
                   <div className="text-[10px] text-blue-600 cursor-pointer hover:underline" onClick={handleSaveConfig}>保存此组合</div>
                 </div>
                 
-                {/* TCO Chart Placeholder */}
                 <div className="flex-1 border border-gray-100 rounded bg-white p-2 flex flex-col">
                   <div className="text-[10px] text-gray-500 mb-1 font-semibold">TCO 多维对比图表</div>
-                  <div className="flex-1 flex items-end gap-2 pt-2">
-                    <div className="flex-1 flex flex-col items-center gap-1">
-                      <div className="w-full bg-blue-200 rounded-t" style={{ height: '60%' }}></div>
+                  <div className="flex-1 flex items-end gap-2 pt-2 h-24">
+                    <div className="flex-1 flex flex-col items-center gap-1 h-full justify-end">
+                      <div className="w-full bg-blue-400 rounded-t transition-all duration-500" style={{ height: `${initialCostHeight}%` }}></div>
                       <span className="text-[8px] text-gray-400">初期成本</span>
                     </div>
-                    <div className="flex-1 flex flex-col items-center gap-1">
-                      <div className="w-full bg-indigo-300 rounded-t" style={{ height: material > 50 ? '30%' : '50%' }}></div>
+                    <div className="flex-1 flex flex-col items-center gap-1 h-full justify-end">
+                      <div className="w-full bg-indigo-400 rounded-t transition-all duration-500" style={{ height: `${maintenanceCostHeight}%` }}></div>
                       <span className="text-[8px] text-gray-400">维保成本</span>
                     </div>
-                    <div className="flex-1 flex flex-col items-center gap-1">
-                      <div className="w-full bg-teal-400 rounded-t" style={{ height: days < 15 ? '80%' : '40%' }}></div>
+                    <div className="flex-1 flex flex-col items-center gap-1 h-full justify-end">
+                      <div className="w-full bg-teal-400 rounded-t transition-all duration-500" style={{ height: `${timeCostHeight}%` }}></div>
                       <span className="text-[8px] text-gray-400">时间成本</span>
                     </div>
                   </div>
                 </div>
               </motion.div>
             )}
-            {!isCalculating && !showResult && (
-              <div className="h-full flex items-center justify-center text-xs text-gray-400 border border-dashed border-gray-200 rounded-lg">
-                调整上方滑块查看实时测算结果
-              </div>
-            )}
           </AnimatePresence>
         </div>
 
-        <div className="flex gap-2">
-          <ButtonOutline onClick={handleSaveConfig} className="flex-1 justify-center" color="indigo"><Bookmark size={12} /> 保存此组合</ButtonOutline>
-          <ButtonSolid onClick={() => onNext(days)} disabled={isCalculating || !showResult} className="flex-1">确认当前方案</ButtonSolid>
-        </div>
+        <ButtonSolid onClick={() => onNext(config)} disabled={isCalculating || !showResult}>确认最终方案</ButtonSolid>
       </div>
     </Card>
   );
 };
 
-const Step5Card = ({ days, onNext }: { days: number, onNext: () => void }) => (
+const Step4Card = ({ config, onNext }: { config: ConfigState, onNext: () => void }) => (
   <Card className="mt-2">
     <div className="p-4 border-b border-gray-50 flex justify-between items-start">
       <div className="flex items-center gap-2">
@@ -438,15 +443,17 @@ const Step5Card = ({ days, onNext }: { days: number, onNext: () => void }) => (
           <div className="flex justify-between"><span className="text-gray-500">采购数量:</span><span className="text-gray-800 font-medium">10 台</span></div>
           <div className="flex justify-between"><span className="text-gray-500">设计工作压力:</span><span className="text-gray-800 font-medium">2.0 kPa ±10% (1.8~2.2 kPa)</span></div>
           <div className="flex justify-between"><span className="text-gray-500">稳态调压精度:</span><span className="text-blue-600 font-medium bg-blue-50 px-1 rounded">≤±10%</span></div>
+          <div className="flex justify-between"><span className="text-gray-500">管件材质:</span><span className="text-indigo-600 font-medium">{config.material > 50 ? '304不锈钢' : '碳钢防腐'}</span></div>
           <div className="flex justify-between"><span className="text-gray-500">运行噪音限制:</span><span className="text-gray-800">≤55dB (近居民区)</span></div>
         </div>
       </Accordion>
 
       <Accordion title="特种工况与配套要求" defaultOpen={false}>
         <div className="space-y-2 text-xs">
-          <div className="flex justify-between"><span className="text-gray-500">防冷凝模块:</span><span className="text-indigo-600 font-medium">防冷凝加热型调压箱</span></div>
-          <div className="flex justify-between"><span className="text-gray-500">安全监测配套:</span><span className="text-gray-800">防爆电源、智能压力监测远传终端</span></div>
-          <div className="flex justify-between"><span className="text-gray-500">特种服务:</span><span className="text-gray-800">特种保温防护安装服务</span></div>
+          <div className="flex justify-between"><span className="text-gray-500">防冻保温等级:</span><span className="text-indigo-600 font-medium">{config.insulation === 'advanced' ? '智能防爆电伴热' : '标准保温棉'}</span></div>
+          <div className="flex justify-between"><span className="text-gray-500">远传监控:</span><span className="text-indigo-600 font-medium">{config.telemetry === 'full' ? '5G全量数据远传' : '基础表计(人工抄表)'}</span></div>
+          <div className="flex justify-between"><span className="text-gray-500">安全监测配套:</span><span className="text-gray-800">防爆可燃气体探测器、智能压力监测终端</span></div>
+          <div className="flex justify-between"><span className="text-gray-500">特种服务:</span><span className="text-gray-800">狭小空间吊装指导</span></div>
         </div>
       </Accordion>
 
@@ -462,7 +469,7 @@ const Step5Card = ({ days, onNext }: { days: number, onNext: () => void }) => (
           </div>
           <div className="bg-gray-50 p-2 rounded border border-gray-100">
             <div className="font-semibold text-gray-800 mb-1 flex items-center gap-1"><Truck size={12} className="text-indigo-500"/> 交付最优路径</div>
-            <div className="text-gray-600">承诺 <span className="font-bold text-indigo-600">{days} 天</span> 内到货。针对老旧小区空间受限，采用模块化拆装设计，人工辅助小型卷扬机就位。</div>
+            <div className="text-gray-600">承诺 <span className="font-bold text-indigo-600">{config.days} 天</span> 内到货。针对老旧小区空间受限，采用模块化拆装设计，人工辅助小型卷扬机就位。</div>
           </div>
         </div>
       </Accordion>
@@ -508,7 +515,7 @@ const Step5Card = ({ days, onNext }: { days: number, onNext: () => void }) => (
   </Card>
 );
 
-const Step6Card = ({ days }: { days: number }) => (
+const Step6Card = ({ config }: { config: ConfigState }) => (
   <Card className="mt-2 border-blue-200 shadow-[0_4px_20px_rgba(59,130,246,0.1)]">
     <div className="p-4 bg-gradient-to-r from-blue-600 to-blue-500 text-white flex justify-between items-center">
       <div className="flex items-center gap-2"><Target size={18} /><span className="font-semibold text-sm">供应商能力需求清单</span></div>
@@ -521,7 +528,7 @@ const Step6Card = ({ days }: { days: number }) => (
           <div className="w-8 h-8 rounded bg-white shadow-sm flex items-center justify-center text-blue-600 shrink-0"><Truck size={16} /></div>
           <div>
             <div className="text-xs font-semibold text-gray-800 mb-1">履约交付能力</div>
-            <div className="text-[10px] text-gray-600 leading-relaxed">需要具备根据客户给出时效（<span className="font-bold text-blue-600">{days}天</span>）准时排产与到货的敏捷物流能力。</div>
+            <div className="text-[10px] text-gray-600 leading-relaxed">需要具备根据客户给出时效（<span className="font-bold text-blue-600">{config.days}天</span>）准时排产与到货的敏捷物流能力。</div>
           </div>
         </div>
 
@@ -577,22 +584,19 @@ export default function App() {
     simulateAI(<div><p className="text-sm mb-2">您好！我是需智。我察觉到您的项目进度有了新动向。</p><PreJourneyCard onConfirm={() => {
       addMessage('user', "是的，我要买10个燃气调压箱，居民小区改造用，最近冬天老降温，怕冻坏了影响供气，要尽快到货。");
       simulateAI(<div><p className="text-sm mb-2">好的，接下来我将基于收集到的信息，帮你分析清晰的物资信息。</p><Step1Card onConfirm={() => {
-        addMessage('user', "确认基础物资信息");
-        simulateAI(<div><p className="text-sm mb-2">好的，你已确认基础物资信息，现在为你进行物资机理能力测算并生成最优配置。</p><Step2Card onNext={() => {
-          addMessage('user', "查看3D仿真与市场分析");
-          simulateAI(<div><p className="text-sm mb-2">已为您生成3D数字孪生视图，并扫描全国供应链产能库。</p><Step3Card onNext={() => {
-            addMessage('user', "调整方案或确认");
-            simulateAI(<div><p className="text-sm mb-2">请根据实际预算和工期，拖拽滑块进行个性化调节。</p><Step4Card onNext={(days) => {
-              addMessage('user', "确认需求");
-              simulateAI(<div><p className="text-sm mb-2">方案已锁定，正在为您生成《采购需求说明书》...</p><Step5Card days={days} onNext={() => {
-                addMessage('user', "共识并确认采购需求");
-                simulateAI(<div><p className="text-sm mb-2">需求已确认并归档！您可以随时导出《采购需求说明书》进行后续采购流程。基于您的需求，已生成供应商能力标尺。</p><Step6Card days={days} /></div>);
-              }} /></div>);
+        addMessage('user', "确认初步需求");
+        simulateAI(<div><p className="text-sm mb-2">好的，你已确认初步需求，现在为你进行物资机理能力测算并生成初步需求说明。</p><Step2Card onNext={() => {
+          addMessage('user', "查看3D仿真与个性化调节");
+          simulateAI(<div><p className="text-sm mb-2">已为您生成3D数字孪生视图，并扫描全国供应链产能库。请根据实际预算和工期，拖拽滑块进行个性化调节。</p><Step3Card onNext={(config) => {
+            addMessage('user', "确认最终方案");
+            simulateAI(<div><p className="text-sm mb-2">方案已锁定，正在为您生成最终的《采购需求说明书》...</p><Step4Card config={config} onNext={() => {
+              addMessage('user', "共识并确认采购需求");
+              simulateAI(<div><p className="text-sm mb-2">需求已确认并归档！您可以随时导出《采购需求说明书》进行后续采购流程。基于您的需求，已生成供应商能力标尺。</p><Step6Card config={config} /></div>);
             }} /></div>);
           }} /></div>);
         }} /></div>);
       }} /></div>);
-    }} /></div>, 500);
+    }} /></div>);
   };
 
   return (
